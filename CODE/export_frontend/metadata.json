@@ -1,0 +1,33 @@
+{
+    "model_name": "cifar10_improved_model",
+    "input_shape": [
+        32,
+        32,
+        3
+    ],
+    "classes": [
+        "airplane",
+        "automobile",
+        "bird",
+        "cat",
+        "deer",
+        "dog",
+        "frog",
+        "horse",
+        "ship",
+        "truck"
+    ],
+    "num_classes": 10,
+    "preprocessing": {
+        "resize": [
+            32,
+            32
+        ],
+        "color_mode": "rgb",
+        "normalize": "divide_by_255"
+    },
+    "output": {
+        "type": "softmax",
+        "description": "Probabilità sulle 10 classi CIFAR-10"
+    }
+}
