@@ -2,8 +2,9 @@
 app.py
 cifar10_improved_model.keras
 
-2. apri il cmd nella stessa cartella
-3. assicurati di avere un ambiente python 3.12 e tutte le librerie installate importante nel file app.py
+2. assicurati di avere un ambiente python 3.12 e tutte le librerie installate importante nel file app.py
+
+3. apri il cmd nella stessa cartella
 
 4. manda il comando 
 python3.12 -m streamlit run app.py
