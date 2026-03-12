@@ -1,4 +1,4 @@
 Anagrammi con un minimo di senso:
-- MAGIC GDFMN
-- GAMIN CDFM
 - MAIN GGCDFM
+- MAGIC GDFMN
+- GAMING CDFM

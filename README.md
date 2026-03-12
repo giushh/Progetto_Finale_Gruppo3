@@ -47,10 +47,11 @@ Image_Recognizer_CNN/
 │
 ├─ UTILITIES/                           # Risorse e strumenti di supporto
 │   ├─ img_samples.png                  # Esempi di immagini del dataset
-│   └─ modello_cifar10.h5               # Modello CNN salvato (baseline o versione precedente)
+│   ├─ modello_cifar10.h5               # Modello CNN salvato (baseline o versione precedente)
+│   └─ nomi_alternativi_gruppo.txt      # File inutile quanto simpatico
 │
 ├─ env_progetto/                        # Ambiente virtuale locale (da ignorare)
-│   └─ ...                              # File di configurazione (da ignorare)
+│   └─ -                                # File di configurazione (da ignorare)
 │
 ├─  requirements.txt                    # Dipendenze Python del progetto
 ├─ .gitattributes                       # Configurazioni Git per gestione file
@@ -122,7 +123,7 @@ Nota: il progetto è stato sviluppato e testato utilizzando in tutti i casi il d
 ### Regole di Utilizzo 
 Sono stati implementati tre metodi, con diversi gradi di interfaccia grafica e visibilità del codice.
 
-#### Web App (con apertura del codice)
+#### Streamlit/Web App (con apertura del codice)
 - Controllare che `app.py` e `cifar10_improved_model.keras` siano nella stessa cartella
 - Assicurarsi che l'ambiente supporti [**Python 3.12**](https://www.python.org/downloads/release/python-3120/) e tutte le librerie importate nel file `app.py` siano installate
 - Posizionarsi nella cartella mediante GUI o con:
@@ -136,7 +137,7 @@ Sono stati implementati tre metodi, con diversi gradi di interfaccia grafica e v
 - Seguire le istruzioni a schermo
 - Attendere l'esito
 
-#### Gradio (con apertura del codice)
+#### Gradio (con apertura del codice) - IN LAVORAZIONE e NON COMPLETAMENTE FUNZIONANTE
 - Eseguire il file `CNN_base.ipynb` mediante il pulsante `Run All` nell'editor di codice
 - Seguire le istruzioni a schermo caricando un'immagine
 - Attendere l'esito
