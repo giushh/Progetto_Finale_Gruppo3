@@ -7,10 +7,10 @@
 Classificazione Immagini con CNN (CIFAR-10)
 
 Collaboratori: 
-- [Gabriele Giuliani](https://github.com/giulianigabbo95/) (Sviluppo Documentazione)
-- [Ilaria Cuccaro](https://github.com/giushh/) (Sviluppo Rete Neurale)
-- [Marco Aurelio De Felicis](https://github.com/MarcoAurelioDeFelicis) (Sviluppo Front-End Gradio)
-- [Mariagrazia Nuzzolese](https://github.com/mariagrazianuzzolese05-svg) (Sviluppo Front-End Discord)
+- [Gabriele Giuliani](https://github.com/giulianigabbo95/)
+- [Ilaria Cuccaro](https://github.com/giushh/)
+- [Marco Aurelio De Felicis](https://github.com/MarcoAurelioDeFelicis)
+- [Mariagrazia Nuzzolese](https://github.com/mariagrazianuzzolese05-svg)
 
 ---
 
@@ -19,8 +19,6 @@ Collaboratori:
 Image_Recognizer_CNN/
 │
 ├─ .git/                                # Cartella interna di Git (versionamento)
-├─ .vscode/                             # Configurazioni dell'editor VS Code
-│   └─ settings.json                    # Impostazioni locali del progetto
 │
 ├─ CODE/                                # Codice principale per training ed esperimenti
 │   ├─ EXPORT/                          # Output esportati da notebook o pipeline
@@ -38,10 +36,9 @@ Image_Recognizer_CNN/
 │   └─ link_dataset.py                  # Script per download o collegamento dataset
 │
 ├─ FRONTEND/                            # Interfaccia utente dell'applicazione
-│   └─ app.py                           # Applicazione (probabilmente Streamlit)
+│   └─ app.py                           # Versione finale dell'app
 │
-├─ RESULT/                              # Output finale del progetto
-│   ├─ app.py                           # Versione finale dell'app
+├─ RESULT/                              # Output finale del progetto                    
 │   ├─ cifar10_improved_model.keras     # Modello CNN addestrato
 │   └─ guida_veloce.md                  # Guida rapida all'utilizzo
 │
@@ -50,8 +47,10 @@ Image_Recognizer_CNN/
 │   ├─ modello_cifar10.h5               # Modello CNN salvato (baseline o versione precedente)
 │   └─ nomi_alternativi_gruppo.txt      # File inutile quanto simpatico
 │
-├─ env_progetto/                        # Ambiente virtuale locale (da ignorare)
-│   └─ -                                # File di configurazione (da ignorare)
+├─ env_progetto/                        # Variabili d'ambiente per l'ambiente virtuale (da ignorare)
+│   ├─ -
+│   : 
+│   └─ -
 │
 ├─  requirements.txt                    # Dipendenze Python del progetto
 ├─ .gitattributes                       # Configurazioni Git per gestione file
@@ -137,15 +136,11 @@ Sono stati implementati tre metodi, con diversi gradi di interfaccia grafica e v
 - Seguire le istruzioni a schermo
 - Attendere l'esito
 
-#### Gradio (con apertura del codice) - IN LAVORAZIONE e NON COMPLETAMENTE FUNZIONANTE
-- Eseguire il file `CNN_base.ipynb` mediante il pulsante `Run All` nell'editor di codice
-- Seguire le istruzioni a schermo caricando un'immagine
-- Attendere l'esito
-
 #### Discord (senza apertura del codice)
 - Aggiungere il bot [MaGMI Image Recognizer](https://discord.com/oauth2/authorize?client_id=1480557912794337330&permissions=8&integration_type=0&scope=bot) al proprio server Discord
 - Avviare il bot
-- Caricare un'immagine scrivendo come descrizione il comando:
+- Inserire il comando `!info` nel box "Invia Messaggio" e premere invio per ottenere una guida con ulteriori spiegazioni e istruzioni.
+- Caricare un'immagine nel box "Invia Messaggio" scrivendo come descrizione il comando e premere invio:
     ```Discord
         !classifica
     ```
