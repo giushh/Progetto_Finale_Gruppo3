@@ -183,4 +183,7 @@ cython_debug/
 # Impostazioni locali di VS Code
 .vscode/
 
+#env del venv
+env_progetto
+
 .env
