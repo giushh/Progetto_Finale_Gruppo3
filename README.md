@@ -4,7 +4,9 @@
 ![Dataset](https://img.shields.io/badge/Dataset-CIFAR10-green)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
-Classificazione Immagini con CNN (CIFAR-10)
+**Classificazione Immagini con CNN (CIFAR-10)**:  
+Questo progetto implementa un modello di classificazione di immagini basato su rete neurale convoluzionale utilizzando il dataset CIFAR-10, e un test mediante web demo sviluppata con Streamlit e bot Discord.
+Il modello è stato addestrato per distinguere tra dieci categorie di oggetti e animali a partire da immagini di piccole dimensioni.  
 
 Collaboratori: 
 - [Gabriele Giuliani](https://github.com/giulianigabbo95/)
@@ -48,16 +50,16 @@ Image_Recognizer_CNN/
 │   │   └─ matrice_confusione.png       # Immagine della matrice con i risultati dell'addestramento del nuovo modello
 │   ├─ SAMPLES                          # Cartella con i grafici ottenuti dal codice
 │   │   ├─ ImmaginiConDiffVecchioNuovo  # Immagini che azzecca solo il modello più potente
-│   │   │	├─ cane(topo).jpg           # Immagine di chihuahua
-│   │   │	├─ cavallo.jpg              # Immagine di cavallo
+│   │   │   ├─ cane(topo).jpg           # Immagine di chihuahua
+│   │   │   ├─ cavallo.jpg              # Immagine di cavallo
 │   │   │   └─ veliero.png              # Immagine di veliero
 │   │   ├─ ImmaginiGeneriche            # Immagini che azzecca ogni modello
-│   │   │	├─ aereo.jpg                # Immagine di aereo
-│   │   │	├─ cane.jpg                 # Immagine di cane
-│   │   │	├─ cavallo.jpg              # Immagine di cavallo
-│   │   │	├─ cervo.jpg                # Immagine di cervp
-│   │   │	├─ gatto.jpg                # Immagine di gatto
-│   │   │	├─ rana.jpg                 # Immagine di rana
+│   │   │   ├─ aereo.jpg                # Immagine di aereo
+│   │   │   ├─ cane.jpg                 # Immagine di cane
+│   │   │   ├─ cavallo.jpg              # Immagine di cavallo
+│   │   │   ├─ cervo.jpg                # Immagine di cervp
+│   │   │   ├─ gatto.jpg                # Immagine di gatto
+│   │   │   ├─ rana.jpg                 # Immagine di rana
 │   │   │   └─ uccello.jpg              # Immagine di uccello
 │   │   └─ img_samples.png              # Esempi di immagini del dataset
 │   ├─ modello_cifar10.h5               # Modello CNN salvato (baseline o versione precedente)
@@ -438,3 +440,16 @@ Il progetto segue 18 fasi principali:
     - riutilizzare il modello senza doverlo riaddestrare
     - integrarlo in un frontend o applicazione web
     - eventualmente convertirlo in formati compatibili con altri ambienti di esecuzione.
+	
+---
+
+# Sviluppi Futuri
+Questo progetto rappresenta una base solida per ulteriori miglioramenti e possibili estensioni.  
+Alcune direzioni di sviluppo future includono:
+- Strategie di training più sofisticate:
+	L'introduzione di tecniche avanzate come data augmentation più estesa, learning rate scheduling più complessi o transfer learning potrebbe migliorare ulteriormente le performance del modello.
+- Addestramento su CIFAR-100:
+	Un'estensione naturale del progetto sarebbe l'utilizzo del dataset CIFAR-100, che contiene 100 classi invece di 10.  
+	Questo renderebbe il problema significativamente più complesso e permetterebbe di testare la scalabilità dell'architettura proposta.
+- Evoluzione dell'architettura web:
+	L'applicazione Streamlit potrebbe essere evoluta in una web app più completa, con funzionalità aggiuntive come visualizzazione delle probabilità di classificazione, confronto tra modelli diversi o integrazione con servizi di deploy cloud.
