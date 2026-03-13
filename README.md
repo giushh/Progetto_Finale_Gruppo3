@@ -61,14 +61,15 @@ Image_Recognizer_CNN/
 │   │   │   ├─ gatto.jpg                # Immagine di gatto
 │   │   │   ├─ rana.jpg                 # Immagine di rana
 │   │   │   └─ uccello.jpg              # Immagine di uccello
+│   │   ├─ ImmaginiTestAmbiguità        # Immagini ambigue per ogni modello
+│   │   │   ├─ AereoGatto.jpg           # Immagine di gatto in un aereo giocatto
+│   │   │   ├─ CamionVecchio.jpg        # Immagine vecchio camion FIAT
+│   │   │   ├─ Giraffa.jpeg             # Immagine di una giraffa
+│   │   │   ├─ Nero.png                 # Immagine totalmente nera
+│   │   │   └─ Zebra.jpg                # Immagine di una zebra
 │   │   └─ img_samples.png              # Esempi di immagini del dataset
 │   ├─ modello_cifar10.h5               # Modello CNN salvato (baseline o versione precedente)
 │   └─ nomi_alternativi_gruppo.txt      # File inutile quanto simpatico
-
-├─ env_progetto/                        # Variabili d'ambiente per l'ambiente virtuale (da ignorare)
-│   ├─ -
-│   : 
-│   └─ -
 │
 ├─  requirements.txt                    # Dipendenze Python del progetto
 ├─ .gitattributes                       # Configurazioni Git per gestione file
