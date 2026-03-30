@@ -1,0 +1,3 @@
+### RUN FRONTEND come MODULO ###  
+python3 -m streamlit run FRONTEND/app.py
+
