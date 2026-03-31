@@ -1,3 +1,6 @@
 ### RUN FRONTEND come MODULO ###  
 python3 -m streamlit run FRONTEND/app.py
 
+###freeze dei requirements
+pip freeze > requirements.txt  
+

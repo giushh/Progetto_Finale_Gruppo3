@@ -9,18 +9,21 @@
 import nest_asyncio
 import io
 import numpy as np
-import tensorflow as tf
 from PIL import Image
 import discord
 from discord.ext import commands
 import os
 from dotenv import load_dotenv 
-import tensorflow as tf
-import numpy as np
-import matplotlib.pyplot as plt
 from pathlib import Path
+import sys
+
+# Aggiungi la root del progetto al sys.path PRIMA di importare moduli personalizzati
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
+sys.path.append(str(PROJECT_ROOT))
+
 import keras
-from PIL import Image
+from CODE.utils import ColorJitter
+
 
 # Patch necessaria per far girare il loop di Discord dentro Jupyter
 nest_asyncio.apply()  #Ho incluso nest_asyncio perché i file Jupyter hanno spesso conflitti con i loop di Discord.
@@ -38,13 +41,12 @@ if not TOKEN:
 # Carichiamo il file `keras` generato durante la fase di training e definiamo le 10 etichette del dataset CIFAR-10.
 
 # Percorso relativo dalla cartella bot/ a RESULT/
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
-MODEL_PATH = os.path.join(PROJECT_ROOT, "RESULT", "cifar10_improved_model.keras")
+MODEL_PATH = os.path.join(PROJECT_ROOT, "RESULT", "cifar10_improved_model_V2.keras")
 
 
 try:
     # Aggiungiamo compile=False per ignorare l'ottimizzatore PyTorch incompatibile
-    model = keras.models.load_model(MODEL_PATH, compile=False)
+    model = keras.models.load_model(MODEL_PATH, compile=False,custom_objects={"ColorJitter": ColorJitter})
     if model:
         print("✅ Modello caricato correttamente (modalità inferenza)!")
 
@@ -217,3 +219,8 @@ try:
     bot.run(TOKEN)
 except Exception as e:
     print(f"❌ Impossibile avviare il bot. Il bot NON è attivo. Dettaglio Errore: {e}")
+
+
+""" if __name__ == "__main__":
+    main()
+ """
