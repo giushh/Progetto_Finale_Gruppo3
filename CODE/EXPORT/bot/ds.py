@@ -219,3 +219,8 @@ try:
     bot.run(TOKEN)
 except Exception as e:
     print(f"❌ Impossibile avviare il bot. Il bot NON è attivo. Dettaglio Errore: {e}")
+
+
+""" if __name__ == "__main__":
+    main()
+ """
