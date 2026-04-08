@@ -24,6 +24,8 @@ CLASS_NAMES = [
     "dog", "frog", "horse", "ship", "truck"
 ]
 
+MAX_IMAGES = 5
+
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -289,6 +291,12 @@ st.markdown("""
         color: #5a7a6b;
     }
 
+    .image-divider {
+        border: none;
+        border-top: 1px solid rgba(77, 116, 92, 0.15);
+        margin: 2rem 0;
+    }
+
     .stFileUploader > label {
         display: none;
     }
@@ -417,9 +425,8 @@ def get_model():
         st.error(f"⚠️ Model not found at: {MODEL_PATH}")
         return None
     try:
-        # --- MODIFICA QUESTA RIGA ---
         return keras.models.load_model(
-            MODEL_PATH, 
+            MODEL_PATH,
             custom_objects={"ColorJitter": ColorJitter}
         )
     except Exception as e:
@@ -529,14 +536,95 @@ def render_top3_streamlit(top_predictions):
 
         with right:
             st.markdown(
-                f"""
-                <div class="pred-value">{prob:.1%}</div>
-                """,
+                f'<div class="pred-value">{prob:.1%}</div>',
                 unsafe_allow_html=True
             )
 
         st.progress(float(prob))
         st.markdown('</div>', unsafe_allow_html=True)
+
+
+def render_image_analysis(uploaded_file, file_idx, total_files, model):
+    """Renders the full analysis block for a single image."""
+    image = Image.open(uploaded_file).convert("RGB")
+    top_predictions, all_predictions, tech_img = process_and_predict(image, model)
+    best_label, best_prob = top_predictions[0]
+
+    # Divider between images (skip for the first)
+    if file_idx > 1:
+        st.markdown('<hr class="image-divider">', unsafe_allow_html=True)
+
+    # Image header
+    st.markdown(
+        f"""
+        <div class="glass-panel" style="margin-bottom:1rem;">
+            <div class="section-title">Image {file_idx} of {total_files}</div>
+            <div class="section-caption">{uploaded_file.name}</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    left_col, right_col = st.columns([1, 1.12], gap="large")
+
+    with left_col:
+        st.markdown('<div class="image-card">', unsafe_allow_html=True)
+        st.image(image, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown(
+            f"""
+            <div class="mini-stats">
+                <div class="mini-pill">Top class: {best_label}</div>
+                <div class="mini-pill">Confidence: {best_prob:.1%}</div>
+                <div class="mini-pill">CNN input: 32×32</div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # Aggiunta key univoca anche all'expander per sicurezza
+        with st.expander("Technical preview", expanded=False):
+            st.image(tech_img, caption="Normalized model input", width=220)
+            st.info(
+                f"Statistics: Min={tech_img.min():.2f}, Max={tech_img.max():.2f}, Mean={tech_img.mean():.2f}"
+            )
+
+    with right_col:
+        st.markdown(
+            """
+            <div class="glass-panel">
+                <div class="section-title">Analysis Results</div>
+                <div class="section-caption">Top predictions and probability distribution</div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # Assicurati che anche render_top3_streamlit non generi conflitti se contiene widget
+        render_top3_streamlit(top_predictions)
+
+        fig = make_donut_chart(all_predictions)
+        
+        # FIX: Aggiunta la key univoca basata su file_idx
+        st.plotly_chart(
+            fig, 
+            use_container_width=True, 
+            config={"displayModeBar": False},
+            key=f"plotly_chart_{file_idx}"
+        )
+
+        st.markdown(
+            f"""
+            <div class="summary-box">
+                <strong>Predicted class:</strong> {best_label}<br>
+                Based on the visual features extracted from the image, the model considers
+                this sample most similar to the <strong>{best_label}</strong> category,
+                with a confidence score of <strong>{best_prob:.1%}</strong>.
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
 
 def main():
@@ -563,11 +651,11 @@ def main():
         st.stop()
 
     st.markdown(
-        """
+        f"""
         <div class="upload-shell">
-            <div class="upload-title">Upload an image for classification</div>
+            <div class="upload-title">Upload images for classification</div>
             <div class="upload-subtitle">
-                Drag and drop a file or browse your device to analyze the image.
+                Drag and drop up to <strong>{MAX_IMAGES} images</strong> or browse your device to analyze them.
             </div>
         </div>
         """,
@@ -636,80 +724,25 @@ def main():
             height=0,
         )
 
-        uploaded_file = st.file_uploader(
-            "Upload image",
+        uploaded_files = st.file_uploader(
+            "Upload images",
             type=["jpg", "jpeg", "png"],
-            label_visibility="collapsed"
+            label_visibility="collapsed",
+            accept_multiple_files=True  # 🆕 Multi-image support
         )
 
-    if uploaded_file:
-        image = Image.open(uploaded_file).convert("RGB")
-        top_predictions, all_predictions, tech_img = process_and_predict(image, model)
-        best_label, best_prob = top_predictions[0]
-
-        left_col, right_col = st.columns([1, 1.12], gap="large")
-
-        with left_col:
-            st.markdown(
-                """
-                <div class="glass-panel">
-                    <div class="section-title">Input Image</div>
-                    <div class="section-caption">Uploaded sample used for inference</div>
-                </div>
-                """,
-                unsafe_allow_html=True
+    # 🆕 Limit check
+    if uploaded_files:
+        if len(uploaded_files) > MAX_IMAGES:
+            st.warning(
+                f"⚠️ You can upload a maximum of **{MAX_IMAGES} images** at a time. "
+                f"Please remove {len(uploaded_files) - MAX_IMAGES} file(s)."
             )
+            st.stop()
 
-            st.markdown('<div class="image-card">', unsafe_allow_html=True)
-            st.image(image, use_container_width=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-
-            st.markdown(
-                f"""
-                <div class="mini-stats">
-                    <div class="mini-pill">Top class: {best_label}</div>
-                    <div class="mini-pill">Confidence: {best_prob:.1%}</div>
-                    <div class="mini-pill">CNN input: 32×32</div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-            with st.expander("Technical preview"):
-                st.image(tech_img, caption="Normalized model input", width=220)
-                st.info(
-                    f"Statistics: Min={tech_img.min():.2f}, Max={tech_img.max():.2f}, Mean={tech_img.mean():.2f}"
-                )
-
-        with right_col:
-            st.markdown(
-                """
-                <div class="glass-panel">
-                    <div class="section-title">Analysis Results</div>
-                    <div class="section-caption">Top predictions and probability distribution</div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-            render_top3_streamlit(top_predictions)
-
-            fig = make_donut_chart(all_predictions)
-            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
-
-            st.markdown(
-                f"""
-                <div class="summary-box">
-                    <strong>Predicted class:</strong> {best_label}<br>
-                    Based on the visual features extracted from the image, the model considers
-                    this sample most similar to the <strong>{best_label}</strong> category,
-                    with a confidence score of <strong>{best_prob:.1%}</strong>.
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-            
+        # 🆕 Loop over all uploaded files
+        for file_idx, uploaded_file in enumerate(uploaded_files, start=1):
+            render_image_analysis(uploaded_file, file_idx, len(uploaded_files), model)
 
     else:
         st.markdown(

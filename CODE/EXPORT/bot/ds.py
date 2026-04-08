@@ -88,84 +88,99 @@ intents = discord.Intents.default()
 intents.message_content = True 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+MAX_IMMAGINI = 5
+FORMATI_CONSENTITI = {'.jpg', '.jpeg', '.png', '.webp', '.bmp'}
+
 @bot.command()
 async def classifica(ctx):
-    # Controllo iniziale: esiste un allegato?
+    # Controllo 1: almeno un allegato
     if not ctx.message.attachments:
-        await ctx.send("⚠️ Allega una foto!")
+        await ctx.send("⚠️ Allega almeno una foto!")
         return
-    attachment = ctx.message.attachments[0]
-    # 1. Messaggio di stato iniziale
-    loading_msg = await ctx.send("⌛ Inizializzazione scansione...")
 
-    try:
-    # 2. Acquisizione e Pre-processing fisico
-        await loading_msg.edit(content="📡 `███░░░░░░░` Acquisizione e ricampionamento...")
-        # Lettura immagine originale
-        image_bytes = await attachment.read()
-        pil_img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-        # --- LOGICA DI RIDIMENSIONAMENTO ---
-        #Creiamo la versione 32x32 per il modello (Uso Lanczos per la qualità del segnale)
-        small_img = pil_img.resize((32, 32), Image.Resampling.LANCZOS)
-        # Ingrandiamo la versione 32x32 a 400x400 per la visualizzazione Discord
-        # Usiamo NEAREST per mantenere i pixel nitidi (effetto "pixel art")
-        display_img = small_img.resize((400, 400), Image.Resampling.NEAREST)
-        # Salvataggio in un buffer di memoria per l'invio
-        image_binary = io.BytesIO()
-        display_img.save(image_binary, 'PNG')
-        image_binary.seek(0)
-        discord_file = discord.File(fp=image_binary, filename="pixel_analysis.png")
+    # Controllo 2: limite massimo immagini
+    if len(ctx.message.attachments) > MAX_IMMAGINI:
+        await ctx.send(
+            f"⚠️ Puoi inviare al massimo **{MAX_IMMAGINI} immagini** alla volta. "
+            f"Hai allegato {len(ctx.message.attachments)}."
+        )
+        return
 
-        # Prepariamo l'immagine per l'inferenza (passiamo i bytes al modello)
-        processed_img = prepare_image(image_bytes)
-        # 3. Fase di Inferenza (Analisi Neurale)
-        await loading_msg.edit(content="🧠 `███████░░░` Analisi neurale in corso...")
-        preds = model(processed_img, training=False)
-        probs = preds[0].numpy()
+    # Iterazione su tutti gli allegati
+    for i, attachment in enumerate(ctx.message.attachments, start=1):
 
-        # Calcolo Top 3 Probabilità
+        # Controllo 3: formato file valido
+        estensione = Path(attachment.filename).suffix.lower()
+        if estensione not in FORMATI_CONSENTITI:
+            await ctx.send(
+                f"⚠️ L'immagine **{attachment.filename}** non è supportata.\n"
+                f"Formati accettati: `{', '.join(FORMATI_CONSENTITI)}`"
+            )
+            continue  # Salta e passa alla prossima
 
-        top3_indices = np.argsort(probs)[-3:][::-1]
-        index_primario = top3_indices[0]
-        confidenza_primaria = probs[index_primario] * 100
+        loading_msg = await ctx.send(f"⌛ [{i}/{len(ctx.message.attachments)}] Inizializzazione scansione...")
 
-       # 4. Completamento e Invio Risultati
-        await loading_msg.edit(content="✅ `██████████` Scansione completata!")
+        try:
+            # Step 1 — Acquisizione e pre-processing
+            await loading_msg.edit(content=f"📡 [{i}] `███░░░░░░░` Acquisizione e ricampionamento...")
+            image_bytes = await attachment.read()
+            pil_img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
 
-        # Costruzione dell'Embed
-        embed = discord.Embed(title="🔍 Analisi CIFAR-10", color=0x3498db)
+            small_img = pil_img.resize((32, 32), Image.Resampling.LANCZOS)
+            display_img = small_img.resize((400, 400), Image.Resampling.NEAREST)
 
-       # Impostiamo l'immagine ingrandita come immagine principale
-        embed.set_image(url="attachment://pixel_analysis.png")
+            image_binary = io.BytesIO()
+            display_img.save(image_binary, 'PNG')
+            image_binary.seek(0)
+            discord_file = discord.File(fp=image_binary, filename=f"pixel_analysis_{i}.png")
 
-       # Risultato principale (Top 1)
-        embed.add_field(name="Oggetto Identificato", value=f"✨ **{class_names[index_primario].upper()}**", inline=False)
-        embed.add_field(name="Grado di Sicurezza", value=f"📈 {confidenza_primaria:.2f}%", inline=True)
+            processed_img = prepare_image(image_bytes)
 
-       # Costruzione testo per Top 3
+            # Step 2 — Inferenza
+            await loading_msg.edit(content=f"🧠 [{i}] `███████░░░` Analisi neurale in corso...")
+            preds = model(processed_img, training=False)
+            probs = preds[0].numpy()
 
-        testo_top3 = ""
-        for i, idx in enumerate(top3_indices):
+            top3_indices = np.argsort(probs)[-3:][::-1]
+            index_primario = top3_indices[0]
+            confidenza_primaria = probs[index_primario] * 100
 
-            nome = class_names[idx].capitalize()
-            p = probs[idx] * 100
-            testo_top3 += f"**{i+1}.** {nome}: `{p:.2f}%`\n"
-        embed.add_field(name="📊 Top 3 Probabilità", value=testo_top3, inline=False)
-        embed.set_footer(text="Vista AI: 32x32 (Upscaled) | MaGMI Image Recognizer")
+            await loading_msg.edit(content=f"✅ [{i}] `██████████` Scansione completata!")
 
-        # Rimuoviamo il caricamento e inviamo file + embed
+            # Step 3 — Costruzione embed
+            embed = discord.Embed(
+                title=f"🔍 Analisi CIFAR-10 — Immagine {i}/{len(ctx.message.attachments)}",
+                color=0x3498db
+            )
+            embed.set_image(url=f"attachment://pixel_analysis_{i}.png")
+            embed.add_field(
+                name="Oggetto Identificato",
+                value=f"✨ **{class_names[index_primario].upper()}**",
+                inline=False
+            )
+            embed.add_field(
+                name="Grado di Sicurezza",
+                value=f"📈 {confidenza_primaria:.2f}%",
+                inline=True
+            )
 
-        await loading_msg.delete()
-        await ctx.send(file=discord_file, embed=embed)
+            testo_top3 = ""
+            for j, idx in enumerate(top3_indices):
+                nome = class_names[idx].capitalize()
+                p = probs[idx] * 100
+                testo_top3 += f"**{j+1}.** {nome}: `{p:.2f}%`\n"
+            embed.add_field(name="📊 Top 3 Probabilità", value=testo_top3, inline=False)
+            embed.set_footer(text="Vista AI: 32x32 (Upscaled) | MaGMI Image Recognizer")
 
-    except Exception as e:
+            # Step 4 — Invio risultato
+            await loading_msg.delete()
+            await ctx.send(file=discord_file, embed=embed)
 
-        # Gestione errori robusta
-        if 'loading_msg' in locals():
-            await loading_msg.edit(content=f"❌ Errore durante la scansione: {e}")
-        else:
-            await ctx.send(f"❌ Errore critico: {e}")
-
+        except Exception as e:
+            if 'loading_msg' in locals():
+                await loading_msg.edit(content=f"❌ Errore durante la scansione dell'immagine {i}: {e}")
+            else:
+                await ctx.send(f"❌ Errore critico sull'immagine {i}: {e}")
 
 # ### Gestione Errori
 
